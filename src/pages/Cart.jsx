@@ -1,36 +1,160 @@
-// src/pages/Cart.jsx
 import React from "react";
 import { useCart } from "../contexts/CartContext";
+import { Link } from "react-router-dom";
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart, totalPrice } = useCart();
+  const { items, updateQty, removeFromCart, clearCart } = useCart();
 
-  if (!cart.length) return <p>Your cart is empty</p>;
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price * item.qty,
+    0
+  );
+
+  // 🟢 Razorpay Payment Handler (Vercel-safe)
+  const handlePayment = async () => {
+    if (totalPrice <= 0) {
+      alert("Cart amount is invalid");
+      return;
+    }
+
+    try {
+      // 1️⃣ Create order (Vercel serverless API)
+      const res = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: totalPrice }),
+      });
+
+      const order = await res.json();
+
+      if (!order.id) {
+        throw new Error("Order creation failed");
+      }
+
+      // 2️⃣ Razorpay checkout options
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // 🔐 ENV variable
+        amount: order.amount,
+        currency: order.currency,
+        name: "BookBazaar",
+        description: "Book Purchase",
+        order_id: order.id,
+
+        handler: function (response) {
+          console.log("Payment Success:", response);
+          alert("Payment Successful 🎉");
+          clearCart();
+        },
+
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Payment failed:", error);
+      alert("Payment failed. Please try again.");
+    }
+  };
+
+  // 🟡 Empty cart state
+  if (items.length === 0) {
+    return (
+      <div className="container" style={{ textAlign: "center" }}>
+        <h1>🛒 Your Cart</h1>
+        <p>Your cart is empty.</p>
+        <Link to="/" className="btn btn-primary">
+          Continue Shopping
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
-      <h1>Cart</h1>
+      <h1 style={{ marginBottom: "1.5rem" }}>🛒 Your Cart</h1>
+
       <div className="grid">
-        {cart.map(item => (
-          <div key={item._id} className="card">
-            <div className="card-image"><img src={item.image} alt={item.title} /></div>
+        {items.map((item) => (
+          <div key={item._id} className="card fade-in">
+            <div className="card-image">
+              <img src={item.image} alt={item.title} />
+            </div>
+
             <div className="card-body">
               <h3>{item.title}</h3>
-              <div>₹ {item.price}</div>
-              <div>
-                <button onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
-                <button onClick={() => removeFromCart(item._id)}>Remove</button>
+              <p className="muted">₹ {item.price}</p>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  margin: "0.5rem 0",
+                }}
+              >
+                <button
+                  className="btn"
+                  disabled={item.qty <= 1}
+                  onClick={() => updateQty(item._id, item.qty - 1)}
+                >
+                  −
+                </button>
+
+                <span>{item.qty}</span>
+
+                <button
+                  className="btn"
+                  onClick={() => updateQty(item._id, item.qty + 1)}
+                >
+                  +
+                </button>
               </div>
+
+              <p>
+                Subtotal: <strong>₹ {item.price * item.qty}</strong>
+              </p>
+
+              <button
+                className="btn btn-ghost"
+                onClick={() => removeFromCart(item._id)}
+              >
+                Remove
+              </button>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="cart-summary">
-        <h3>Subtotal: ₹ {totalPrice.toFixed(2)}</h3>
-        <button className="btn btn-primary" onClick={() => (window.location.href = "/checkout")}>Proceed to checkout</button>
+      {/* Cart summary */}
+      <div
+        style={{
+          marginTop: "2rem",
+          padding: "1.5rem",
+          borderRadius: "12px",
+          background: "#0f172a",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <h2>Total: ₹ {totalPrice}</h2>
+
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <button className="btn btn-ghost" onClick={clearCart}>
+            Clear Cart
+          </button>
+
+          <button className="btn btn-primary" onClick={handlePayment}>
+            Pay Now
+          </button>
+        </div>
       </div>
     </div>
   );

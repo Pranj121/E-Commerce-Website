@@ -1,55 +1,66 @@
-// src/pages/BookDetails.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
+import { useWishlist } from "../contexts/WishlistContext";
+import Spinner from "../components/Spinner";
 
 export default function BookDetails() {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { addToWishlist } = useWishlist();
+
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    let mounted = true;
-    async function fetchBook() {
-      try {
-        const res = await fetch(`/api/products/${id}`);
-        const data = await res.json();
-        if (mounted) setBook(data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    fetchBook();
-    return () => (mounted = false);
+    fetch(`${import.meta.env.VITE_API_URL}${import.meta.env.VITE_PRODUCTS_API}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const foundBook = data.find((b) => b._id === id);
+        if (!foundBook) {
+          setError("Book not found");
+        } else {
+          setBook(foundBook);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setError("Failed to load book details");
+        setLoading(false);
+      });
   }, [id]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!book) return <p>Book not found</p>;
+  if (loading) return <Spinner />;
+
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "2rem" }}>
+        <p>{error}</p>
+        <Link to="/" className="btn">Go Back</Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="container">
-      <div className="card card--detail">
-        <div className="card-image">
-          <img src={book.image} alt={book.title} />
-        </div>
-        <div className="card-body">
-          <h1>{book.title}</h1>
-          <p className="muted">by {book.author}</p>
-          <p className="muted">{book.category}</p>
-          <div className="price">₹ {book.price}</div>
-          <p>{book.description}</p>
+    <div className="book-details">
+      <img src={book.image} alt={book.title} className="book-details-image" />
 
-          <div className="actions">
-            <button className="btn btn-primary" onClick={() => addToCart(book, 1)}>
-              Add to Cart
-            </button>
-            <button className="btn btn-ghost" onClick={() => window.scrollTo(0, 0)}>
-              Save for later
-            </button>
-          </div>
+      <div className="book-details-info">
+        <h1>{book.title}</h1>
+        <p><strong>Author:</strong> {book.author}</p>
+        <p><strong>Category:</strong> {book.category}</p>
+
+        <h2>₹ {book.price}</h2>
+
+        <div className="book-details-actions">
+          <button className="btn btn-primary" onClick={() => addToCart(book)}>
+            Add to Cart
+          </button>
+
+          <button className="btn btn-ghost" onClick={() => addToWishlist(book)}>
+            ❤️ Wishlist
+          </button>
         </div>
       </div>
     </div>

@@ -1,16 +1,14 @@
-/* src/index.css */
-
 /* =========================
    Theme / root variables
    ========================= */
 :root {
-  --bg-1: #020617;       /* page background */
-  --bg-2: #1f2937;       /* card / panel background */
-  --accent: #38bdf8;     /* links / highlights */
-  --muted: #9aa7b0;      /* secondary text */
+  --bg-1: #020617;
+  --bg-2: #1f2937;
+  --accent: #38bdf8;
+  --muted: #9aa7b0;
   --card-border: rgba(255,255,255,0.03);
   --text: #e5e7eb;
-  --success: #22c55e;    /* whatsapp green */
+  --success: #22c55e;
   --danger: #f43f5e;
   --gold: #f59e0b;
   --glass: rgba(255,255,255,0.02);
@@ -18,252 +16,176 @@
   --radius-lg: 12px;
   --radius-sm: 6px;
   --max-width: 1200px;
-  font-family: "Segoe UI", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --motion-reduce: 0.001s;
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* =========== Global reset =========== */
 *,
 *::before,
-*::after { box-sizing: border-box; }
+*::after {
+  box-sizing: border-box;
+}
 
-html, body, #root { height: 100%; }
+html, body, #root {
+  height: 100%;
+}
+
 body {
   margin: 0;
   color: var(--text);
-  background: radial-gradient(circle at 10% 8%, #1f2937 0%, var(--bg-1) 50%, #000 100%);
+  background: radial-gradient(circle at 10% 8%, #1f2937 0%, var(--bg-1) 55%, #000 100%);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   min-width: 320px;
   line-height: 1.45;
-  -webkit-tap-highlight-color: transparent;
 }
 
-/* container helper */
+/* container */
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 2rem;
 }
 
-/* links */
-a { color: var(--accent); text-decoration: none; font-weight: 600; }
-a:hover, a:focus { color: #0ea5e9; outline: none; }
+/* =========================
+   Typography
+   ========================= */
+h1, h2, h3 {
+  margin: 0 0 .6rem 0;
+  font-weight: 700;
+}
+p {
+  margin: 0 0 1rem 0;
+  color: var(--muted);
+}
 
-/* typography helpers */
-h1,h2,h3,h4 { margin: 0 0 .6rem 0; font-weight: 700; color: var(--text); }
-p { margin: 0 0 1rem 0; color: var(--muted); }
-
-/* ================ Buttons - global ================ */
-button {
+/* =========================
+   Buttons
+   ========================= */
+button,
+.btn {
   border-radius: 999px;
   border: 1px solid transparent;
-  padding: 0.45rem 1rem;
+  padding: .45rem 1rem;
   font-size: .95rem;
   font-weight: 600;
-  font-family: inherit;
-  background-color: #1f2937;
+  background: #1f2937;
   color: var(--text);
   cursor: pointer;
-  transition: background-color .15s ease, border-color .15s ease, transform .08s ease;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 }
-button:hover { background-color: #111827; transform: translateY(-1px); }
-button:active { transform: translateY(0); }
-button:focus-visible { outline: 3px solid rgba(56,189,248,0.18); outline-offset: 3px; border-radius: 10px; }
 
-/* primary button */
+button:hover,
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+
+button:active,
+.btn:active {
+  transform: scale(0.96);
+}
+
+button[disabled] {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
 .btn-primary {
-  background: linear-gradient(180deg, #06b6d4, #0891b2);
-  color: white;
-  border: none;
-  box-shadow: 0 8px 20px rgba(6,182,212,0.12);
-}
-.btn-primary:hover { filter: brightness(1.03); }
-
-/* ghost */
-.btn-ghost { background: transparent; border: 1px solid var(--card-border); color: var(--text); }
-
-/* add-to-cart button */
-.btn-add {
-  background: linear-gradient(180deg,#10b981,#059669);
-  color: white;
-  padding: .45rem .9rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 999px;
+  background: linear-gradient(180deg,#06b6d4,#0891b2);
+  color: #fff;
 }
 
-/* small helpers for disabled state */
-button[disabled], .disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--card-border);
+}
 
-/* ============ Header + Nav ============ */
-
-/* site header wrapper */
+/* =========================
+   Navbar
+   ========================= */
 .site-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
   padding: 1.25rem 2rem;
-  background: transparent;
 }
 
-/* brand */
 .brand {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  font-size: 1.5rem;
-  font-weight: 800;
+  text-decoration: none;
   color: var(--text);
-}
-.brand-icon {
-  width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(90deg,#06b6d4,#0891b2);
-  display: inline-block;
+  font-weight: 800;
+  font-size: 1.1rem;
 }
 
-/* container for actions (right side) */
-.site-actions {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-}
-
-/* =======================
-   NAVBAR - layout + mobile
-   ======================= */
-
-/* main nav container (center links) */
 .site-nav {
   display: flex;
   gap: 1.25rem;
-  align-items: center;
-  margin-left: 2rem;
 }
 
-/* individual links (desktop) */
 .navlink {
   color: var(--text);
-  text-decoration: none;
+  opacity: .85;
   font-weight: 600;
-  font-size: 1rem;
-  opacity: 0.85;
-  transition: opacity .2s ease, color .2s ease, background .12s ease;
-  padding: .2rem .25rem;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
+  text-decoration: none;
 }
-.navlink:hover, .navlink:focus { opacity: 1; color: var(--accent); background: rgba(56,189,248,0.03); outline: none; }
 
-/* active link state */
+.navlink:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
 .navlink--active {
   color: var(--accent);
-  opacity: 1;
-  font-weight: 700;
   border-bottom: 2px solid var(--accent);
-  padding-bottom: 2px;
 }
 
-/* accessible focus for active link too */
-.navlink--active:focus { outline: 3px solid rgba(56,189,248,0.12); outline-offset: 3px; }
-
-/* Hamburger button (mobile) */
-.hamburger {
-  display: none;
-  background: transparent;
-  border: none;
-  font-size: 1.25rem;
-  padding: .35rem;
-  border-radius: 6px;
-  color: var(--text);
-}
-
-/* cart small badge (used inside navbar) */
-.cart-badge {
-  display: inline-block;
-  background: var(--gold);
-  color: #07121a;
-  min-width: 1.4rem;
-  padding: 0 .45rem;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: .85rem;
-  line-height: 1.4rem;
-  text-align: center;
-}
-
-/* ---------- Cart link wrapper (helper) ---------- */
-/* Use this when you wrap cart text/icon + badge in a Link or <a> */
-.cart-link {
-  display: inline-flex;
+.site-actions {
+  display: flex;
+  gap: .75rem;
   align-items: center;
-  gap: 0.45rem;
-  color: var(--text);
-  text-decoration: none;
-  padding: 0.25rem 0.4rem;
-  border-radius: 8px;
-  transition: background .12s ease, color .12s ease, transform .06s ease;
+}
+
+/* User dropdown */
+.user-menu {
+  position: relative;
+}
+
+.user-name {
+  cursor: pointer;
   font-weight: 600;
 }
-.cart-link:hover,
-.cart-link:focus {
-  background: rgba(56,189,248,0.03);
-  color: var(--accent);
-  transform: translateY(-1px);
-  outline: none;
-}
-.cart-link:focus-visible {
-  outline: 3px solid rgba(56,189,248,0.12);
-  outline-offset: 3px;
-  border-radius: 8px;
-}
-.cart-link .icon {
-  display: inline-flex;
-  width: 18px;
-  height: 18px;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.95rem;
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: 130%;
+  background: #020617;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  padding: .5rem;
+  min-width: 140px;
+  box-shadow: var(--shadow);
 }
 
-/* Mobile navigation rules */
-@media (max-width: 780px) {
-
-  /* hide normal links and show hamburger + dropdown */
-  .site-nav {
-    position: absolute;
-    top: 70px;
-    left: 0;
-    right: 0;
-    background: var(--bg-2);
-    padding: 1.2rem;
-    flex-direction: column;
-    gap: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    display: none; /* hidden by default */
-    z-index: 30;
-    margin-left: 0;
-  }
-
-  /* open state (toggle this class from JS) */
-  .site-nav--open { display: flex; }
-
-  .hamburger { display: inline-flex; }
-
-  /* larger tap target for mobile links */
-  .navlink { font-size: 1.05rem; padding: .6rem .8rem; width: 100%; border-radius: 8px; }
-  .navlink--active { border-bottom: none; background: rgba(56,189,248,0.06); }
+.user-dropdown a,
+.user-dropdown button {
+  display: block;
+  width: 100%;
+  padding: .4rem .6rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
 }
 
-/* =====================
-   Product grid & cards
-   ===================== */
+/* =========================
+   Grid & Cards
+   ========================= */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
   gap: 1.25rem;
   margin-top: 1.5rem;
 }
@@ -273,174 +195,122 @@ button[disabled], .disabled { opacity: .45; cursor: not-allowed; transform: none
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
   padding: 1rem;
-  box-shadow: var(--shadow);
-  min-height: 320px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  box-shadow: var(--shadow);
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
-/* image area */
-.card .card-image { width: 100%; height: 180px; background: var(--glass); border-radius: 8px; overflow: hidden; display:flex; align-items:flex-start; justify-content:flex-start; }
-.card .card-image img { width:100%; height:100%; object-fit: cover; }
-
-/* content */
-.card .card-title { font-size: 1.05rem; font-weight: 700; margin-top: .6rem; }
-.card .card-author { color: var(--muted); font-size: .9rem; margin-top:.3rem; }
-.card .card-category { color: #a5b4fc; font-size: .85rem; margin-top:.25rem; }
-.card .card-description { color: var(--muted); font-size: .92rem; margin-top:.7rem; line-height:1.4; }
-
-/* footer row */
-.card .card-footer { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:1rem; }
-.price { color: var(--gold); font-weight:800; font-size:1.05rem; }
-
-/* small adjustments for the footer buttons */
-.card .card-footer .btn { padding: .4rem .8rem; font-size: .9rem; }
-.card .card-footer .btn + .btn { margin-left: .5rem; }
-
-/* ---------- Wishlist button (card-level) ---------- */
-.wishlist-btn {
-  background: transparent;
-  border: 1px solid var(--card-border);
-  color: var(--text);
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  cursor: pointer;
-  transition: transform .12s ease, background .12s ease, color .12s ease;
-  font-weight: 700;
-  font-size: .9rem;
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0,0,0,.55);
 }
 
-/* heart icon inside wishlist button */
-.wishlist-btn .heart {
-  display: inline-flex;
-  width: 18px;
-  height: 18px;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  transition: transform .18s cubic-bezier(.2,.9,.2,1), color .12s ease;
-  will-change: transform;
+.card-image {
+  height: 180px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-/* active (saved) state */
-.wishlist-btn--active {
-  background: rgba(244,63,94,0.08);
-  border-color: rgba(244,63,94,0.14);
-  color: var(--danger);
-}
-.wishlist-btn--active .heart {
-  transform: scale(1.14) rotate(-6deg);
-  color: var(--danger);
-  text-shadow: 0 6px 16px rgba(244,63,94,0.12);
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.wishlist-btn:hover { transform: translateY(-2px); }
-.wishlist-btn:focus-visible {
-  outline: 3px solid rgba(244,63,94,0.12);
-  outline-offset: 3px;
+/* =========================
+   Book Details Page
+   ========================= */
+.book-details {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
 }
 
-/* tiny pop animation when adding to wishlist
-   NOTE: the JS may add `wishlist-animate` to either the parent button
-   or directly to the heart element. Support both cases below.
-*/
+.book-details-image {
+  width: 280px;
+  border-radius: var(--radius-lg);
+}
+
+.book-details-info h1 {
+  margin-bottom: .5rem;
+}
+
+.book-details-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* =========================
+   Wishlist
+   ========================= */
+.wishlist-empty {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+/* wishlist animation */
 @keyframes wishlist-pop {
-  0%   { transform: scale(1); }
-  35%  { transform: scale(1.25) rotate(-8deg); }
-  70%  { transform: scale(0.98) rotate(4deg); }
-  100% { transform: scale(1) rotate(0); }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.3) rotate(-8deg); }
+  100% { transform: scale(1); }
 }
 
-/* support when class applied to parent (button) */
 .wishlist-animate .heart {
-  animation: wishlist-pop 420ms cubic-bezier(.2,.9,.2,1);
-  animation-fill-mode: forwards;
+  animation: wishlist-pop .4s ease;
 }
 
-/* support when class applied directly to the heart element */
-.heart.wishlist-animate {
-  animation: wishlist-pop 420ms cubic-bezier(.2,.9,.2,1);
-  animation-fill-mode: forwards;
+/* =========================
+   Spinner
+   ========================= */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #334155;
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 1.5rem auto;
 }
 
-/* ================
-   WhatsApp FAB
-   ================ */
-.whatsapp-fab {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  background-color: var(--success);
-  color: #0f172a;
-  border: none;
-  border-radius: 999px;
-  padding: 0.65rem 1.2rem;
-  font-size: .95rem;
-  font-weight: 700;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  z-index: 60;
-  cursor: pointer;
-  transition: transform .12s ease, filter .12s ease;
-}
-.whatsapp-fab:hover { filter: brightness(1.06); transform: translateY(-2px); }
-.whatsapp-fab:focus-visible { outline: 3px solid rgba(34,197,94,0.18); outline-offset: 3px; }
-
-/* small screens - scale the fab */
-@media (max-width:480px) {
-  .whatsapp-fab { padding: .55rem .9rem; right: 1rem; bottom: 1rem; font-size: .85rem; }
-  .grid { grid-template-columns: 1fr; }
-  .container { padding: 1rem; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-/* ===========================
-   Search and small helpers
-   =========================== */
+/* =========================
+   Search
+   ========================= */
 .search-input {
-  padding: 0.5rem 0.75rem;
+  padding: .55rem .9rem;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.25);
   color: inherit;
-  min-width: 260px;
-  outline: none;
-  transition: box-shadow .12s ease, border-color .12s ease;
-}
-.search-input:focus { box-shadow: 0 4px 14px rgba(56,189,248,0.06); border-color: rgba(56,189,248,0.32); }
-
-/* muted text helper */
-.text-muted { color: var(--muted); }
-
-/* layout helpers */
-.flex { display:flex; }
-.center { display:flex; align-items:center; justify-content:center; }
-
-/* small utility spacing */
-.mt-1 { margin-top: .5rem; }
-.mt-2 { margin-top: 1rem; }
-.mb-1 { margin-bottom: .5rem; }
-.p-1 { padding: .5rem; }
-
-/* small responsive tweaks */
-@media (max-width: 980px) {
-  .site-header { padding-left: 1rem; padding-right: 1rem; }
-  .brand { font-size: 1.25rem; }
-  .site-nav { margin-left: 1rem; }
 }
 
-/* reduce motion preference */
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 600px) {
+  .book-details {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 1rem; }
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* reduce motion */
 @media (prefers-reduced-motion: reduce) {
-  * { transition-duration: var(--motion-reduce) !important; animation-duration: var(--motion-reduce) !important; animation-iteration-count: 1 !important; }
+  * {
+    transition-duration: var(--motion-reduce) !important;
+    animation-duration: var(--motion-reduce) !important;
+  }
 }
-
-/* final accessibility small rules */
-a:focus, button:focus { outline-offset: 3px; }
-
-/* end of file */
 
