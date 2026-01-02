@@ -18,8 +18,13 @@ export default function CartPage() {
     }
 
     try {
-      // 1️⃣ Create order (Vercel serverless API)
-      const res = await fetch("/api/payment/create-order", {
+      // 1️⃣ Create order (backend API)
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const endpoint = `${apiBase}/api/payment/create-order`;
+
+      console.log('[Cart] creating order ->', endpoint, 'amount:', totalPrice);
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,9 +32,16 @@ export default function CartPage() {
         body: JSON.stringify({ amount: totalPrice }),
       });
 
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('[Cart] create-order failed', res.status, text);
+        throw new Error(`Server error ${res.status}: ${text}`);
+      }
+
       const order = await res.json();
 
-      if (!order.id) {
+      if (!order || !order.id) {
+        console.error('[Cart] invalid order response', order);
         throw new Error("Order creation failed");
       }
 
