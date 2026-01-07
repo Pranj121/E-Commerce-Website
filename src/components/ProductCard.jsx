@@ -1,95 +1,56 @@
-// src/components/ProductCard.jsx
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
 
-/**
- * ProductCard component
- * Props:
- *  - book: the product object (expects _id, title, author, image, price, description, category)
- *  - onAddToCart: function(book) (optional)
- */
-export default function ProductCard({ book, onAddToCart }) {
-  const { _id, title, author, image, price, description, category } = book || {};
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+export default function ProductCard({ book }) {
+  const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
-  // local UI animation flag (small pop when toggling)
-  const [anim, setAnim] = useState(false);
-
-  const wished = isInWishlist(_id);
-
-  const toggleWishlist = () => {
-    if (!book || !_id) return;
-
-    if (wished) {
-      removeFromWishlist(_id);
-    } else {
-      addToWishlist(book);
-    }
-
-    // briefly animate the heart
-    setAnim(true);
-    window.setTimeout(() => setAnim(false), 500);
-  };
+  const liked = isInWishlist(book._id);
 
   return (
-    <article className="card" aria-labelledby={`book-${_id}-title`}>
-      <Link to={`/books/${_id}`} className="card-image" aria-label={title}>
-        {image ? (
-          <img src={image} alt={title} />
-        ) : (
-          <div style={{ height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span>No image</span>
-          </div>
-        )}
-      </Link>
+    <div className="card">
+      <div className="card-image">
+        <img src={book.image} alt={book.title} />
+      </div>
 
       <div className="card-body">
-        <h3 id={`book-${_id}-title`} className="card-title">{title}</h3>
-        <p className="card-author">by {author}</p>
-        <p className="card-category">{category}</p>
+        <h3 className="card-title">{book.title}</h3>
+        <p className="card-author">by {book.author}</p>
+        <p className="card-category">{book.category}</p>
 
-        <p className="card-description" style={{ marginTop: ".5rem" }}>
-          {description ? (description.length > 120 ? description.slice(0, 120) + "…" : description) : ""}
-        </p>
+        <div className="card-footer">
+          <span className="price">₹ {book.price}</span>
 
-        <div className="card-footer" style={{ marginTop: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div className="price">₹ {price}</div>
-
-          <div style={{ display: "flex", gap: ".5rem", alignItems: "center" }}>
-            {/* Wishlist toggle */}
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            {/* ❤️ WISHLIST TOGGLE */}
             <button
-              type="button"
-              className={
-                "wishlist-btn " +
-                (wished ? "wishlist-btn--active " : "") +
-                (anim ? "wishlist-animate" : "")
-              }
-              onClick={toggleWishlist}
-              aria-pressed={wished}
-              aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-              title={wished ? "Remove from wishlist" : "Add to wishlist"}
+              className="btn btn-ghost"
+              onClick={() => toggleWishlist(book)}
+              style={{
+                color: liked ? "red" : "#94a3b8",
+                fontSize: "18px",
+              }}
             >
-              <span className="heart" aria-hidden>{wished ? "❤️" : "🤍"}</span>
-              <span style={{ display: "none" }}>{wished ? "Saved" : "Save"}</span>
+              ❤️
             </button>
 
-            {/* View details */}
-            <Link to={`/books/${_id}`} className="btn btn-ghost" aria-label={`View ${title}`}>
+            {/* 👁 View Details */}
+            <Link to={`/books/${book._id}`} className="btn btn-ghost">
               View
             </Link>
 
-            {/* Add to cart */}
+            {/* 🛒 Add to Cart */}
             <button
               className="btn btn-primary"
-              onClick={() => onAddToCart && onAddToCart(book)}
-              aria-label={`Add ${title} to cart`}
+              onClick={() => addToCart(book)}
             >
               Add to Cart
             </button>
           </div>
         </div>
       </div>
-    </article>
+    </div>
   );
 }

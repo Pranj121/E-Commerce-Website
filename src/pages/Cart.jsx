@@ -10,7 +10,7 @@ export default function CartPage() {
     0
   );
 
-  // 🟢 Razorpay Payment Handler (Vercel-safe)
+  // 🟢 Razorpay Payment Handler (FINAL + VERIFIED)
   const handlePayment = async () => {
     if (totalPrice <= 0) {
       alert("Cart amount is invalid");
@@ -18,46 +18,63 @@ export default function CartPage() {
     }
 
     try {
-      // 1️⃣ Create order (backend API)
-      const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-      const endpoint = `${apiBase}/api/payment/create-order`;
-
-      console.log('[Cart] creating order ->', endpoint, 'amount:', totalPrice);
-
-      const res = await fetch(endpoint, {
+      // 1️⃣ Create order on backend
+      const apiBase = import.meta.env.VITE_API_URL;
+      const orderRes = await fetch(`${apiBase}/api/payment/create-order`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: totalPrice }),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error('[Cart] create-order failed', res.status, text);
-        throw new Error(`Server error ${res.status}: ${text}`);
+      if (!orderRes.ok) {
+        const text = await orderRes.text();
+        throw new Error(`Order creation failed: ${text}`);
       }
 
-      const order = await res.json();
-
-      if (!order || !order.id) {
-        console.error('[Cart] invalid order response', order);
-        throw new Error("Order creation failed");
+      const order = await orderRes.json();
+      if (!order?.id) {
+        throw new Error("Invalid order response from server");
       }
 
       // 2️⃣ Razorpay checkout options
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // 🔐 ENV variable
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // TEST KEY
         amount: order.amount,
         currency: order.currency,
         name: "BookBazaar",
         description: "Book Purchase",
         order_id: order.id,
 
-        handler: function (response) {
-          console.log("Payment Success:", response);
-          alert("Payment Successful 🎉");
-          clearCart();
+        handler: async function (response) {
+          try {
+            // 3️⃣ VERIFY PAYMENT ON BACKEND (IMPORTANT)
+            const verifyRes = await fetch(
+              `${apiBase}/api/payment/verify`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(response),
+              }
+            );
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.success) {
+              alert("Payment Verified & Successful 🎉");
+              clearCart();
+            } else {
+              alert("Payment verification failed ❌");
+            }
+          } catch (err) {
+            console.error("Verification error:", err);
+            alert("Payment verification error");
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            console.warn("Razorpay popup closed by user");
+          },
         },
 
         theme: {
@@ -66,14 +83,21 @@ export default function CartPage() {
       };
 
       const rzp = new window.Razorpay(options);
+
+      // ❌ Handle payment failure
+      rzp.on("payment.failed", function (response) {
+        console.error("Payment failed:", response.error);
+        alert("Payment failed: " + response.error.description);
+      });
+
       rzp.open();
     } catch (error) {
-      console.error("Payment failed:", error);
+      console.error("Payment error:", error);
       alert("Payment failed. Please try again.");
     }
   };
 
-  // 🟡 Empty cart state
+  // 🟡 Empty cart
   if (items.length === 0) {
     return (
       <div className="container" style={{ textAlign: "center" }}>
@@ -92,7 +116,7 @@ export default function CartPage() {
 
       <div className="grid">
         {items.map((item) => (
-          <div key={item._id} className="card fade-in">
+          <div key={item._id} className="card">
             <div className="card-image">
               <img src={item.image} alt={item.title} />
             </div>
@@ -101,14 +125,7 @@ export default function CartPage() {
               <h3>{item.title}</h3>
               <p className="muted">₹ {item.price}</p>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  margin: "0.5rem 0",
-                }}
-              >
+              <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
                   className="btn"
                   disabled={item.qty <= 1}
@@ -142,7 +159,7 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* Cart summary */}
+      {/* Summary */}
       <div
         style={{
           marginTop: "2rem",
@@ -171,4 +188,3 @@ export default function CartPage() {
     </div>
   );
 }
-

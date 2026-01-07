@@ -16,7 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch books once
+  // 🔹 Fetch books
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -39,7 +39,7 @@ export default function Home() {
     fetchBooks();
   }, []);
 
-  // Apply search + category filters
+  // 🔹 Apply search + category filters
   const applyFilters = useCallback(
     (query, category) => {
       let filtered = [...books];
@@ -60,7 +60,7 @@ export default function Home() {
       }
 
       setFilteredBooks(filtered);
-      setVisibleCount(PAGE_SIZE); // reset scroll
+      setVisibleCount(PAGE_SIZE);
     },
     [books]
   );
@@ -76,7 +76,7 @@ export default function Home() {
     applyFilters(searchQuery, category);
   };
 
-  // Load more books when scrolling
+  // 🔹 Infinite scroll
   const loadMore = () => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
   };
@@ -90,7 +90,7 @@ export default function Home() {
     <div className="container">
       <h1 style={{ marginBottom: "1rem" }}>📚 BookBazaar</h1>
 
-      {/* Search + Filter */}
+      {/* 🔍 Search + Filter */}
       <div
         style={{
           display: "flex",
@@ -119,7 +119,7 @@ export default function Home() {
         </select>
       </div>
 
-      {/* Loading */}
+      {/* ⏳ Loading */}
       {loading && (
         <>
           <Spinner />
@@ -131,18 +131,16 @@ export default function Home() {
         </>
       )}
 
-      {/* Error */}
+      {/* ❌ Error */}
       {!loading && error && (
         <p style={{ textAlign: "center", color: "red" }}>{error}</p>
       )}
 
-      {/* Books */}
+      {/* 📚 Books */}
       {!loading && !error && (
         <>
           {filteredBooks.length === 0 ? (
-            <p style={{ textAlign: "center" }}>
-              No books found.
-            </p>
+            <p style={{ textAlign: "center" }}>No books found.</p>
           ) : (
             <>
               <div className="grid">
@@ -153,13 +151,10 @@ export default function Home() {
                   ))}
               </div>
 
-              {/* Sentinel */}
+              {/* 👇 Infinite scroll sentinel */}
               <div ref={sentinelRef} style={{ height: 1 }} />
 
-              {/* Loading more indicator */}
-              {visibleCount < filteredBooks.length && (
-                <Spinner />
-              )}
+              {visibleCount < filteredBooks.length && <Spinner />}
             </>
           )}
         </>
@@ -167,4 +162,3 @@ export default function Home() {
     </div>
   );
 }
-

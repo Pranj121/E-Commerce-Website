@@ -1,42 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const { signup } = useAuth();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
+
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch(`${API_URL}/api/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message);
-        return;
-      }
-
+      signup(form.name, form.email, form.password);
       alert("Signup successful! Please login.");
       navigate("/login");
     } catch (err) {
-      setError("Server error");
+      setError(err.message || "Signup failed");
     }
   };
 
@@ -50,20 +41,25 @@ export default function Signup() {
         <input
           name="name"
           placeholder="Name"
+          value={form.name}
           onChange={handleChange}
           required
         />
+
         <input
           name="email"
           type="email"
           placeholder="Email"
+          value={form.email}
           onChange={handleChange}
           required
         />
+
         <input
           name="password"
           type="password"
           placeholder="Password"
+          value={form.password}
           onChange={handleChange}
           required
         />
@@ -73,4 +69,3 @@ export default function Signup() {
     </div>
   );
 }
-

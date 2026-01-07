@@ -3,19 +3,21 @@ import { useWishlist } from "../contexts/WishlistContext";
 import ProductCard from "../components/ProductCard";
 
 export default function Wishlist() {
-  const { items } = useWishlist();
+  const { wishlist = [] } = useWishlist(); // ✅ DEFAULT EMPTY ARRAY
 
   return (
     <div className="container">
-      <h1 style={{ marginBottom: "1.5rem" }}>❤️ My Wishlist</h1>
+      <h1 style={{ marginBottom: "1.5rem" }}>
+        ❤️ My Wishlist
+      </h1>
 
-      {items.length === 0 ? (
-        <p style={{ textAlign: "center" }}>
+      {wishlist.length === 0 ? (
+        <p style={{ textAlign: "center", color: "#9ca3af" }}>
           Your wishlist is empty.
         </p>
       ) : (
         <div className="grid">
-          {items.map((book) => (
+          {wishlist.map((book) => (
             <ProductCard key={book._id} book={book} />
           ))}
         </div>
@@ -23,4 +25,3 @@ export default function Wishlist() {
     </div>
   );
 }
-
